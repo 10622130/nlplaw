@@ -21,7 +21,7 @@ app = Flask(__name__)
 app.secret_key = 'your_secret_key'  # 應該使用安全的隨機字符串
 
 
-
+#
 @app.route('/',  methods=['GET','POST'])
 def index():
 
