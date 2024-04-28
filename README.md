@@ -2,7 +2,7 @@
 ## This project provides legal advice and mock exams of the past 10 years' Bar Examination.  
 
 ### API  
-#### Integrating OpenAI completion API with Line SDK to pass user query, for retrieval we utilize OpenAI embeddings API with RAG.  
+#### Integrating OpenAI completion API with Line SDK to pass user query, for retrieval we utilize OpenAI embeddings API with RAG. Each API is deployed in a single GCP cloud run.  
 
 ### DB  
 #### Storing data in PostgreSQL, for vectorized data, I utilize the `pgvector` plugin. Using Pinecone for API testing.  
