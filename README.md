@@ -8,6 +8,7 @@
 #### Storing data in PostgreSQL, for vectorized data, I utilize the `pgvector` plugin. Using Pinecone for API testing.  
 
 ### Model  
-#### In addition to using APIs, we also train open-source LLAMA series models. The inferencing results are shown in the following picture.  
+#### In addition to using APIs, we also train open-source LLAMA series models. The inferencing results are shown in the following picture.
+![alt text](https://github.com/10622130/nlplaw/blob/main/demo/inference.png)
 
 Relevant documents and references are [here](https://puffy-hexagon-4c2.notion.site/Taiwan-Law-chatbot-and-Bar-examination-with-RAG-f699e2925aef4bffb4d5de5d320ddfa4?pvs=4)
