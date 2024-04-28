@@ -5,7 +5,7 @@
 #### Integrating OpenAI completion API with Line SDK to pass user query, for retrieval we utilize OpenAI embeddings API with RAG.  
 
 ### DB  
-#### Storing data in PostgreSQL, for vectorized data, I utilize the '`pgvector`' plugin. Using Pinecone for API testing.  
+#### Storing data in PostgreSQL, for vectorized data, I utilize the `pgvector` plugin. Using Pinecone for API testing.  
 
 ### Model  
 #### In addition to using APIs, we also train open-source LLAMA series models. The inferencing results are shown in the following picture.  
