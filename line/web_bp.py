@@ -1,6 +1,6 @@
 from flask import Blueprint, request, jsonify
 from ai_bp import get_openai_response
-import spamfilter 
+from core.spamfilter import normalize_punctuation, is_valid_text
 
 web_bp = Blueprint('web_bp', __name__)
 
@@ -11,11 +11,11 @@ def user_message():
     if not user_input:
         return jsonify({'error': '請用中文輸入法律相關問題'}), 400
 
-    # 訊息正規化
-    normalized_input = spamfilter.normalize_punctuation(user_input)
-    # 訊息過濾
-    if not spamfilter.is_valid_text(normalized_input):
-        # 直接用 bot response 格式回應錯誤訊息
+    # text normalization
+    normalized_input = normalize_punctuation(user_input)
+    # text filtering
+    if not is_valid_text(normalized_input):
+        # respond with a polite message instead of error
         return jsonify({'response': '請輸入有效中文訊息'}), 200
     
     if len(normalized_input) > 200:

@@ -2,69 +2,15 @@
 from flask import Blueprint, request, current_app
 import requests
 import json
-import hmac
-import hashlib
-import base64
 from models import db, User, UserInput
 from ai_bp import get_openai_response  # 此處用來取得 AI 回應
-from spamfilter import is_valid_text
+from core.spamfilter import is_valid_text
+from core.security import validate_signature
+from core.line_api import send_line_reply as send_line_reply, send_line_push as send_line_push
+
 
 linebot_bp = Blueprint('linebot_bp', __name__)
 
-def validate_signature(body, signature):
-    """
-    驗證簽名是否有效
-    """
-    try:
-        # 從 current_app.config 取得 Channel Secret
-        channel_secret = current_app.config['CHANNEL_SECRET']
-        # 使用 Channel Secret 和 body 計算簽名 
-        hash = hmac.new(channel_secret.encode('utf-8'),
-                        body,  
-                        hashlib.sha256).digest()
-        expected_signature = base64.b64encode(hash).decode('utf-8')  # byte data 轉成 string
-
-        # 使用 hmac.compare_digest() 進行安全比較
-        if hmac.compare_digest(expected_signature, signature):
-            return True
-        else:
-            current_app.logger.error(f"Expected Signature: {expected_signature}, Received: {signature}")
-            return False
-    except Exception as e:
-        current_app.logger.error(f"Error during signature validation: {e}")
-        return False
-
-def send_line_reply(reply_token, text):
-    """發送 LINE 回應訊息"""
-    channel_access_token = current_app.config["CHANNEL_ACCESS_TOKEN"]
-    url = "https://api.line.me/v2/bot/message/reply"
-    headers = {
-        "Content-Type": "application/json",
-        "Authorization": f"Bearer {channel_access_token}"
-    }
-    data = {
-        "replyToken": reply_token,
-        "messages": [{"type": "text", "text": text}]
-    }
-    response = requests.post(url, headers=headers, json=data)
-    if response.status_code != 200:
-        current_app.logger.error(f"Error sending message: {response.text}")
-
-def send_line_push(user_id, text):
-    """用 LINE push API 主動推播訊息"""
-    channel_access_token = current_app.config["CHANNEL_ACCESS_TOKEN"]
-    url = "https://api.line.me/v2/bot/message/push"
-    headers = {
-        "Content-Type": "application/json",
-        "Authorization": f"Bearer {channel_access_token}"
-    }
-    data = {
-        "to": user_id,
-        "messages": [{"type": "text", "text": text}]
-    }
-    response = requests.post(url, headers=headers, json=data)
-    if response.status_code != 200:
-        current_app.logger.error(f"Error sending push message: {response.text}")
 
 @linebot_bp.route("/callback", methods=['POST'])
 def callback():

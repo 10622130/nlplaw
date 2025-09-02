@@ -1,4 +1,3 @@
-
 def normalize_punctuation(text: str) -> str:
     """
     文字格式標準化
@@ -24,25 +23,16 @@ def normalize_punctuation(text: str) -> str:
 
 def is_chinese(ch: str) -> bool:
     """
-    判斷單一字元是否為中文字
-    根據 Unicode 編碼，常見中文字符範圍為 \u4e00 到 \u9fff
+    check if a character is a Chinese character
+    unicode range: \u4e00 to \u9fff (CJK Unified Ideographs)
     """
     return '\u4e00' <= ch <= '\u9fff'
 
 def is_valid_text(text: str, threshold: float = 0.2) -> bool:
     """
-    檢查訊息是否符合規則：
-    去除空格後，非中文字（包括標點符號、數字、英文字母等）不能超過全文長度的 threshold (預設15%)
+    check if the text is valid based on the ratio of non-Chinese characters
+    threshold: maximum allowed ratio of non-Chinese characters
     
-    此處先進行標點符號標準化，以避免因全形與半形標點不一致而影響計算。
-    
-    參數：
-        text: 要檢查的文字訊息
-        threshold: 非中文字比例的上限（預設為 0.2，即20%）
-        
-    回傳：
-        True 代表符合規則（訊息有效）
-        False 代表不符合規則（垃圾訊息）
     """
     # 標點符號標準化
     normalized_text = normalize_punctuation(text)
@@ -50,8 +40,10 @@ def is_valid_text(text: str, threshold: float = 0.2) -> bool:
     text_no_spaces = normalized_text.replace(" ", "").replace("\n", "")
 
     total_len = len(text_no_spaces)
+    if total_len == 0:
+        return False
     non_chinese_count = 0
-    
+
     # 計算每個字元中非中文字的數量
     for ch in text_no_spaces:
         if not is_chinese(ch):
@@ -60,19 +52,3 @@ def is_valid_text(text: str, threshold: float = 0.2) -> bool:
     # 計算非中文字比例
     ratio = non_chinese_count / total_len
     return ratio <= threshold
-
-if __name__ == "__main__":
-    # 測試範例
-    samples = [
-        "Sadjlmcnefle12  39481",
-        "())()(  ))",
-        "[8558675587]",
-        "阿阿阿阿  阿阿",
-        "Ｈｅｌｌｏ，　世界！"  # 全形英文字及標點
-    ]
-    for s in samples:
-        normalized = normalize_punctuation(s)
-        valid = is_valid_text(s)
-        print(f"原始文字: {s}")
-        print(f"標準化後: {normalized}")
-        print(f"是否有效: {valid}\n")
