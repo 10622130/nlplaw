@@ -4,6 +4,7 @@
 /.vscode/
 monitor_memory.sh
 **/__pycache__/
+.github/
 
 # line
 line/data/

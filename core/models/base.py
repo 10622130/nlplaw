@@ -11,6 +11,16 @@ class User(Base):
     created_at = Column(DateTime, default=lambda: datetime.now(timezone.utc))
     updated_at = Column(DateTime, default=lambda: datetime.now(timezone.utc), onupdate=lambda: datetime.now(timezone.utc))
 
+    @classmethod
+    def exists(cls, session, user_id):
+        """
+        check if user_id exists in the database
+        :param session: SQLAlchemy session
+        :param user_id: 欲查詢的 user id
+        :return: True if exists, False otherwise
+        """
+        return session.query(cls).filter_by(id=user_id).first() is not None
+
 class UserInput(Base):
     __tablename__ = 'user_inputs'
 
@@ -19,3 +29,4 @@ class UserInput(Base):
     input_text = Column(Text, nullable=False)
     ai_response = Column(Text, nullable=True)  # 儲存ai回覆
     created_at = Column(DateTime, default=lambda: datetime.now(timezone.utc))
+

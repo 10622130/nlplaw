@@ -1,0 +1,33 @@
+flowchart TD
+    subgraph Web前端
+        A[web_frontend/ SPA]
+    end
+
+    subgraph API層
+        B1[api/flask_app/ Flask API]
+        B2[api/django_app/ Django API]
+    end
+
+    subgraph 共用邏輯
+        C[core/ 業務邏輯<br>models, services, utils]
+    end
+
+    subgraph 測試與文件
+        D1[tests/]
+        D2[docs/]
+    end
+
+    %% 流向
+    A -- "REST API 請求" --> B1
+    A -- "REST API 請求" --> B2
+    B1 -- "呼叫共用邏輯" --> C
+    B2 -- "呼叫共用邏輯" --> C
+
+    %% A/B 測試流向
+    A -. "A/B 測試流量分流" .-> B1
+    A -. "A/B 測試流量分流" .-> B2
+
+    %% 文件與測試
+    B1 -- "單元/整合測試" --> D1
+    B2 -- "單元/整合測試" --> D1
+    C -- "文件/說明" --> D2

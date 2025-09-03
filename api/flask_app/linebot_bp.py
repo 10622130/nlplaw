@@ -3,8 +3,8 @@ from flask import Blueprint, request, current_app
 import requests
 import json
 from models import db, User, UserInput
-from ai_bp import get_openai_response  # 此處用來取得 AI 回應
-from core.spamfilter import is_valid_text
+from ai_bp import get_openai_response  
+from core.spamfilter import is_valid_text, normalize_punctuation, is_chinese
 from core.security import validate_signature
 from core.line_api import send_line_reply as send_line_reply, send_line_push as send_line_push
 
@@ -33,10 +33,10 @@ def callback():
         return "No events found", 400
 
     if not event_data["events"]:
-        current_app.logger.info(" (events 為空)")
+        current_app.logger.info("events 為空")
         return "OK", 200
 
-    event = event_data["events"][0]  # 避免索引錯誤
+    event = event_data["events"][0]  #process only the first event, the user message
 
     event_type = event.get("type")
     message_type = event.get("message", {}).get("type")
