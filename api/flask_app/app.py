@@ -35,7 +35,7 @@ def create_app():
     ]
     missing_envs = [key for key in required_envs if not app.config.get(key)]
     if missing_envs:
-        raise RuntimeError(f"缺少必要環境變數: {', '.join(missing_envs)}")
+        raise RuntimeError(f"Missing envs: {', '.join(missing_envs)}")
 
     # initialize database and migration
     db.init_app(app)

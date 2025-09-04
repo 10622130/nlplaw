@@ -12,7 +12,7 @@ line/nginx.conf
 line/docker-compose.yml
 line/.dockerignore
 
-#  web_frontend 
+#  web
 web_frontend/node_modules/
 web_frontend/.claude/
 web_frontend/package-lock.json
