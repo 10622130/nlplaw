@@ -1,10 +1,12 @@
 # general 
 **/.env
 **/*.md
+**/*.txt
 /.vscode/
 monitor_memory.sh
 **/__pycache__/
 .github/
+.claude/
 
 # line
 line/data/
