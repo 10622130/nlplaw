@@ -1,5 +1,5 @@
 from datetime import timezone, datetime
-from .database import db
+from api.flask_app.models.database import db
 
 class User(db.Model):
     __tablename__ = 'users'

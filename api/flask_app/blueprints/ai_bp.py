@@ -2,7 +2,7 @@ from flask import Blueprint, jsonify, request, current_app
 import time
 from openai import OpenAI
 from core.ai import get_openai_response
-from core.validation import validate_input_text
+from core.spamfilter import validate_input_text
 
 ai_bp = Blueprint('ai_bp', __name__)
 
@@ -44,7 +44,7 @@ def test_openai_key():
     
     try:
         resp = client.chat.completions.create(
-            model="gpt-3.5-turbo",
+            model="gpt-4o",
             messages=[{"role": "user", "content": "Say hello world"}],
             max_tokens=5
         )

@@ -6,22 +6,18 @@ PROMPT_SYSTEM = (
     "若使用者輸入不屬於法律相關問題，就只回答『請輸入法律問題』。"
 )
 
-def get_openai_response(user_input, openai_api_key, logger=None):
+def get_openai_response(user_input, openai_api_key):
 
     client = OpenAI(api_key=openai_api_key)
     try:
         response = client.chat.completions.create(
-            model="gpt-4",
+            model="gpt-4o",
             messages=[
                 {"role": "system", "content": PROMPT_SYSTEM},
                 {"role": "user", "content": user_input}
             ],
         )
         msg = response.choices[0].message.content
-        if logger:
-            logger.info(f"OpenAI response: {msg}")
         return msg
     except Exception as e:
-        if logger:
-            logger.error(f"OpenAI API error: {str(e)}")
         return "AI 發生錯誤，請稍後再試。"

@@ -1,3 +1,5 @@
+
+
 def normalize_punctuation(text: str) -> str:
     """
     Normalize punctuation by converting full-width characters to half-width characters.
@@ -47,3 +49,24 @@ def is_valid_text(text: str, threshold: float = 0.2) -> bool:
     # 計算非中文字比例
     ratio = non_chinese_count / total_len
     return ratio <= threshold
+
+
+
+def validate_input_text(text, max_length=200):
+    """Validate and normalize input text"""
+    if not text or not text.strip():
+        return '請輸入文字訊息'
+    
+    # Normalize text
+    normalized_text = normalize_punctuation(text)
+    
+    # Check length
+    if len(normalized_text) > max_length:
+        return '請將問題縮短至{max_length}字以內'.format(max_length=max_length)
+    
+    # Check if valid Chinese text
+    if not is_valid_text(normalized_text):
+        return '請用中文輸入台灣法律相關問題'
+    
+    else:
+        return normalized_text

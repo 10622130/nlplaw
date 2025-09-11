@@ -21,10 +21,10 @@ class Config:
     API_KEY = os.environ.get('API_KEY', '')
     
     # CORS
-    CORS_ORIGINS = os.environ.get('CORS_ORIGINS', '*')
+    CORS_ORIGINS = os.environ.get('CORS_ORIGINS', '')
     
     # Flask
-    DEBUG = os.environ.get('FLASK_ENV') == 'development'
+    DEBUG = os.environ.get('FLASK_ENV') == 'dev'
     
     # Required environment variables
     REQUIRED_ENV_VARS = [
@@ -44,3 +44,5 @@ class Config:
         
         if missing_vars:
             raise RuntimeError(f"Missing required environment variables: {', '.join(missing_vars)}")
+        
+

@@ -1,6 +1,6 @@
 from flask import Blueprint, request, jsonify, current_app
 from core.ai import get_openai_response
-from core.validation import validate_input_text
+from core.spamfilter import validate_input_text
 
 web_bp = Blueprint('web_bp', __name__)
 

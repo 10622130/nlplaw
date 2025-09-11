@@ -2,15 +2,18 @@ from flask import Flask
 from flask_migrate import Migrate
 from flask_cors import CORS
 import os
+import logging
+from api.flask_app.config import Config
+from api.flask_app.models import db
+from api.flask_app.blueprints import ai_bp, linebot_bp, web_bp
 
-from config import Config
-from models import db
-from blueprints import ai_bp, linebot_bp, web_bp
+
+logging.basicConfig(level=logging.INFO)
+
 
 def create_app():
     """Create and return a Flask app instance with all configurations"""
     app = Flask(__name__)
-    
     # Load configuration
     app.config.from_object(Config)
     Config.validate_config()
