@@ -2,19 +2,24 @@
 **/.env
 **/*.md
 **/*.txt
-/.vscode/
-monitor_memory.sh
+**/*.yml
+**/*.sqlite3
+**/*.log
 **/__pycache__/
+**/.claude/
+.vscode/
+monitor_memory.sh
 .github/
-.claude/
+
+# Migrations
+*/migrations/*.pyc
+*/migrations/*.pyo
 
 # line
 line/data/
 line/nginx.conf
-line/docker-compose.yml
 line/.dockerignore
 
 #  web
 web_frontend/node_modules/
-web_frontend/.claude/
 web_frontend/package-lock.json

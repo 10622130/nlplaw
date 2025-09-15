@@ -53,12 +53,10 @@ def callback():
         
         if event_type != "message":
             current_app.logger.info("not message event")
-            print("not message event")
             return "OK", 200
         
         if message_type != "text":
             current_app.logger.info("not text message")
-            print("not text message")
             return "OK", 200
         
         # Extract and validate message
@@ -66,18 +64,44 @@ def callback():
         user_id = event["source"]["userId"]
         reply_token = event["replyToken"]
         
-        # Validate input text
-        respond_text = get_openai_response(validate_input_text(user_text))
+        # current_app.logger.info(f"user_id:  {user_id} user_text:  {user_text} reply_token:  {reply_token}")
         
-        # Create user if needed
+        # Ensure user exists before processing input
         if not User.exists(user_id):
             User.create(user_id)
-        
+
+        # Validate input text
+        is_valid, validated_text = validate_input_text(user_text)
+        if not is_valid:
+            respond_text = validated_text
+        else:
+            try:
+                # Call AI and log user input and response
+                # Make sure to pass the OpenAI API key as required by get_openai_response
+                respond_text = get_openai_response(validated_text, current_app.config['OPENAI_API_KEY'])
+                user_input = UserInput(
+                    user_id=user_id,
+                    input_text=validated_text,
+                    ai_response=respond_text
+                )
+                db.session.add(user_input)
+                db.session.commit()
+            except Exception as e:
+                db.session.rollback()
+                current_app.logger.error(f"Failed to process user input: {e}")
+                respond_text = "AI 發生錯誤，請稍後再試。"
+
         # Simple reply for now
-        response = send_line_reply(current_app.config['CHANNEL_ACCESS_TOKEN'], reply_token, respond_text)
-        current_app.logger.info(f"LINE reply status: {response.status_code}, body: {response.text}")
-        
-        return "OK", 200
+        response, response_status = send_line_reply(current_app.config['CHANNEL_ACCESS_TOKEN'], reply_token, respond_text)
+        # current_app.logger.info(f"LINE reply status: {response.status_code}, body: {response.text}")
+        if response_status != 200:
+            current_app.logger.error(f"LINE reply failed: {response.status_code}, body: {response.text}")
+            # 你可以選擇回傳錯誤或繼續
+        else:
+            current_app.logger.info("LINE reply success")
+
+        return 'OK', 200
+    
     except Exception as e:
         print("Exception in callback:", e)
         current_app.logger.error(f"Exception in callback: {e}")

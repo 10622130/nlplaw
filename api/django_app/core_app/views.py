@@ -1,4 +1,5 @@
 from django.http import HttpResponse
+# Create your views here.
 
-def index(request):
-    return HttpResponse("Hello from core_app!")
+def hello_world(request):
+    return HttpResponse("Hello, world! This is the core app.")  

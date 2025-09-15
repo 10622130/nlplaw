@@ -18,7 +18,7 @@ def send_line_reply(channel_access_token, reply_token, text):
         "messages": [{"type": "text", "text": text}]
     }
     response = requests.post(url, headers=headers, json=data)
-    return response
+    return response, response.status_code
 
 def send_line_push(channel_access_token, user_id, text):
     """
