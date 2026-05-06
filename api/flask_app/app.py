@@ -5,7 +5,7 @@ import os
 import logging
 from api.flask_app.config import Config
 from api.flask_app.models import db
-from api.flask_app.blueprints import ai_bp, linebot_bp, web_bp
+from api.flask_app.routes import ai_bp, linebot_bp, web_bp
 
 
 logging.basicConfig(level=logging.INFO)
@@ -24,8 +24,10 @@ def create_app():
     # Initialize database and migration
     db.init_app(app)
     Migrate(app, db)
-    
-    
+
+    with app.app_context():
+        db.create_all()
+
     # Register blueprints
     app.register_blueprint(linebot_bp)
     app.register_blueprint(ai_bp, url_prefix="/api")

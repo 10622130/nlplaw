@@ -13,7 +13,6 @@ demo/
 *.ini
 *.env
 .env*
-config.py
 config.yaml
 config.yml
 *config*.json
