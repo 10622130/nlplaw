@@ -1,7 +1,8 @@
 from flask import Blueprint, request, current_app, abort
 import json
 from core.security import validate_signature
-from api.flask_app.services.linebot_service import handle_text_message
+from api.flask_app.models import ProcessedEvent
+from api.flask_app.services.linebot_service import handle_text_message, handle_follow_event
 
 
 linebot_bp = Blueprint('linebot_bp', __name__)
@@ -29,11 +30,25 @@ def callback():
 
 
 def _handle_event(event):
+    webhook_event_id = event.get("webhookEventId")
+
+    if webhook_event_id and ProcessedEvent.exists(webhook_event_id):
+        current_app.logger.info(f"Duplicate event skipped: {webhook_event_id}")
+        return
+
     event_type = event.get("type")
     if event_type == "message":
         _handle_message_event(event)
+    elif event_type == "follow":
+        handle_follow_event(
+            user_id=event["source"]["userId"],
+            reply_token=event["replyToken"],
+        )
     else:
         current_app.logger.info(f"Ignored event type: {event_type}")
+
+    if webhook_event_id:
+        ProcessedEvent.record(webhook_event_id)
 
 
 def _handle_message_event(event):
