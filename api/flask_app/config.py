@@ -10,15 +10,24 @@ class Config:
     SQLALCHEMY_DATABASE_URI = os.environ.get('SQLALCHEMY_DATABASE_URI', '')
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     
-    # LINE Bot
+    # Flask session
+    SECRET_KEY = os.environ.get('SECRET_KEY', 'dev-secret-change-in-prod')
+
+    # LINE Bot (Messaging API)
     CHANNEL_SECRET = os.environ.get('CHANNEL_SECRET', '')
     CHANNEL_ACCESS_TOKEN = os.environ.get('CHANNEL_ACCESS_TOKEN', '')
+
+    # LINE Login (OAuth 2.0)
+    LINE_LOGIN_CHANNEL_ID = os.environ.get('LINE_LOGIN_CHANNEL_ID', '')
+    LINE_LOGIN_CHANNEL_SECRET = os.environ.get('LINE_LOGIN_CHANNEL_SECRET', '')
+    LINE_LOGIN_REDIRECT_URI = os.environ.get('LINE_LOGIN_REDIRECT_URI', 'http://localhost:5002/auth/line/callback')
+    FRONTEND_URL = os.environ.get('FRONTEND_URL', '/')
     
     # OpenAI
     OPENAI_API_KEY = os.environ.get('OPENAI_API_KEY', '')
     
-    # API
-    API_KEY = os.environ.get('API_KEY', '')
+    # Exam API
+    EXAM_API_URL = os.environ.get('EXAM_API_URL', '')
     
     # CORS
     CORS_ORIGINS = os.environ.get('CORS_ORIGINS', '')
