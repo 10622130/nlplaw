@@ -1,0 +1,47 @@
+services:
+  api:
+    build:
+      context: .
+      dockerfile: api/flask_app/Dockerfile
+    ports:
+      - "5002:5002"
+    env_file: .env
+    environment:
+      SQLALCHEMY_DATABASE_URI: postgresql://postgres:postgres@db:5432/lawbot
+      EXAM_API_URL: http://mock-exam:8080/random-question
+      LINE_LOGIN_REDIRECT_URI: http://localhost:5002/auth/line/callback
+    depends_on:
+      db:
+        condition: service_healthy
+      mock-exam:
+        condition: service_started
+    restart: unless-stopped
+
+  mock-exam:
+    image: python:3.10-slim
+    working_dir: /app
+    volumes:
+      - ./mock_exam_api.py:/app/mock_exam_api.py
+    command: python mock_exam_api.py
+    ports:
+      - "8080:8080"
+
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: lawbot
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+    restart: unless-stopped
+
+volumes:
+  postgres_data:
