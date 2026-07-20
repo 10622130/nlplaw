@@ -42,9 +42,8 @@ NLP/
 │       └── exam_session.py        考題答題寫入狀態
 │
 ├── web_frontend/            ← React + Vite 前端
-├── DB/                      ← 資料庫研究腳本（Pinecone、歷史資料匯入）
-├── ETL/                     ← 離線資料管線腳本
-├── mock_exam_api.py         ← 本地測試用 mock 考題 API（docker-compose 引用）
+├── ETL/                     ← 資料爬取處理
+├── mock_exam_api.py         ← 本地測試用 mock 考題 API（）
 └── docker-compose.yml       ← api + db + mock-exam 三服務
 ```
 
