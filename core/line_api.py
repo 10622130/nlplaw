@@ -1,7 +1,6 @@
 import requests
 
 _REPLY_URL = "https://api.line.me/v2/bot/message/reply"
-_PUSH_URL  = "https://api.line.me/v2/bot/message/push"
 
 
 def _auth_headers(token: str) -> dict:
@@ -68,13 +67,3 @@ def get_line_profile(access_token: str) -> dict:
     )
     resp.raise_for_status()
     return resp.json()
-
-
-def send_line_push(channel_access_token: str, user_id: str, text: str):
-    """Push a plain-text message to a user (not limited by reply token)."""
-    resp = requests.post(
-        _PUSH_URL,
-        headers=_auth_headers(channel_access_token),
-        json={"to": user_id, "messages": [text_message(text)]},
-    )
-    return resp
