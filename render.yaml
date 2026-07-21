@@ -1,0 +1,39 @@
+services:
+  - name: lawbot-api
+    type: web
+    runtime: docker
+    dockerfilePath: ./api/flask_app/Dockerfile
+    dockerContext: .
+    plan: starter
+    healthCheckPath: /auth/me
+    envVars:
+      - key: SQLALCHEMY_DATABASE_URI
+        fromDatabase:
+          name: lawbot-db
+          property: connectionString
+      - key: SECRET_KEY
+        generateValue: true
+      - key: CHANNEL_SECRET
+        sync: false
+      - key: CHANNEL_ACCESS_TOKEN
+        sync: false
+      - key: LINE_LOGIN_CHANNEL_ID
+        sync: false
+      - key: LINE_LOGIN_CHANNEL_SECRET
+        sync: false
+      - key: LINE_LOGIN_REDIRECT_URI
+        sync: false
+      - key: FRONTEND_URL
+        sync: false
+      - key: OPENAI_API_KEY
+        sync: false
+      - key: EXAM_API_URL
+        sync: false
+      - key: CORS_ORIGINS
+        sync: false
+
+databases:
+  - name: lawbot-db
+    plan: basic-256mb
+    databaseName: lawbot
+    user: lawbot
