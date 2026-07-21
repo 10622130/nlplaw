@@ -19,8 +19,11 @@ def create_app():
     app.config.from_object(Config)
     Config.validate_config()
     
-    # CORS settings
-    CORS(app, resources={r"/*": {"origins": app.config['CORS_ORIGINS']}})
+    # CORS settings — supports_credentials=True is required so the browser
+    # sends/accepts the session cookie on cross-origin requests from the
+    # frontend (Cloudflare Pages); this only works with an explicit origin
+    # in CORS_ORIGINS, not a "*" wildcard.
+    CORS(app, resources={r"/*": {"origins": app.config['CORS_ORIGINS']}}, supports_credentials=True)
     
     # Initialize database and migration
     db.init_app(app)

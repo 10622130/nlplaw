@@ -121,7 +121,8 @@ body {
 .chat-row.user {
   justify-content: flex-end;
 }
-.chat-row.ai {
+.chat-row.ai,
+.chat-row.error {
   justify-content: flex-start;
 }
 .chat-area {
@@ -155,11 +156,19 @@ body {
 }
 
 .chat-ai {
-  background: transparent !important;
-  border: none !important;
-  padding: 0 !important;
+  background: #243740;
   border: 1px solid #2d4a52;
-  color: #b8c5d1;
+  color: #e0e6ed;
+  box-shadow: none;
+  margin-right: auto;
+  margin-left: 0;
+  display: block;
+}
+
+.chat-error {
+  background: #243740;
+  border: 1px solid #7a2a2a;
+  color: #e0e6ed;
   box-shadow: none;
   margin-right: auto;
   margin-left: 0;

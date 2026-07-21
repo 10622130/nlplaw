@@ -34,7 +34,16 @@ class Config:
     
     # Flask
     DEBUG = os.environ.get('FLASK_ENV') == 'dev'
-    
+
+    # Session cookie: frontend (Cloudflare Pages) and API (Render) are on
+    # different domains in production, so the LINE Login session cookie
+    # needs SameSite=None (which browsers require to be paired with
+    # Secure) to survive a cross-site fetch. Local dev stays on
+    # SameSite=Lax over plain HTTP since Secure cookies aren't sent over
+    # http://localhost.
+    SESSION_COOKIE_SAMESITE = 'Lax' if DEBUG else 'None'
+    SESSION_COOKIE_SECURE = not DEBUG
+
     # Required environment variables
     REQUIRED_ENV_VARS = [
         'SQLALCHEMY_DATABASE_URI',
@@ -42,7 +51,8 @@ class Config:
         'CHANNEL_ACCESS_TOKEN',
         'OPENAI_API_KEY'
     ]
-    
+    # A classmethod can be called without any instance;
+    # it receives the class (cls), so it operates at the class level, not on a single instance.
     @classmethod
     def validate_config(cls):
         """Validate that all required environment variables are present"""

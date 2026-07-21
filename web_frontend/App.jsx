@@ -1,4 +1,12 @@
-import React, { useState, useRef, useEffect } from "react";
+import React, { useState, useEffect } from "react";
+
+// In local dev this is empty — relative paths go through Vite's proxy
+// (vite.config.js) to the same-origin API. In production the frontend
+// (Cloudflare Pages) and API (Render) are on different domains, so this
+// must be set to the full Render URL via the VITE_API_BASE_URL build-time
+// env var, and every request needs credentials: "include" so the
+// cross-site session cookie (LINE Login) is sent/accepted.
+const API_BASE = import.meta.env.VITE_API_BASE_URL || "";
 
 export default function App() {
   const [userMessage, setUserMessage] = useState("");
@@ -6,50 +14,53 @@ export default function App() {
     { role: "ai", text: "您好，請輸入您的法律問題！" }
   ]);
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState("");
-  const [lastSendTime, setLastSendTime] = useState(0);
   const [user, setUser] = useState(null);
-  const timerRef = useRef(null);
 
   useEffect(() => {
-    fetch("/auth/me")
+    fetch(`${API_BASE}/auth/me`, { credentials: "include" })
       .then(r => r.json())
       .then(data => setUser(data.logged_in ? data : null));
   }, []);
 
-  const canSend = () => Date.now() - lastSendTime > 10000;
-
+  // No fixed-time cooldown: the send button is disabled purely by `loading`.
+  // The backend commits any DB write synchronously inside the same
+  // request/response cycle (see web_bp.py's user_message()), so by the time
+  // `await fetch(...)` resolves and `loading` goes back to false, a valid
+  // question's data (if any) has already been persisted — there's no way to
+  // race ahead of the database. Invalid input (empty, or rejected by the
+  // backend's spamfilter) never reaches the DB write at all and returns
+  // fast, so the button naturally unlocks again just as quickly.
   const handleSend = async (e) => {
     e.preventDefault();
-    setError("");
-    if (!userMessage.trim()) { setError("請輸入訊息"); return; }
-    if (!canSend()) { setError("請稍候 10 秒再送出"); return; }
+    const trimmedMessage = userMessage.trim();
+    if (!trimmedMessage) {
+      setMessages(prev => [...prev, { role: "error", text: "請輸入訊息" }]);
+      return;
+    }
 
     setLoading(true);
-    setLastSendTime(Date.now());
-    setMessages(prev => [...prev, { role: "user", text: userMessage }]);
+    setMessages(prev => [...prev, { role: "user", text: trimmedMessage }]);
 
     try {
-      const resp = await fetch("/api/user_message", {
+      const resp = await fetch(`${API_BASE}/api/user_message`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ user_input: userMessage })
+        credentials: "include",
+        body: JSON.stringify({ user_input: trimmedMessage })
       });
       const data = await resp.json();
       if (!resp.ok) throw new Error(data.error || "API 錯誤");
       setMessages(prev => [...prev, { role: "ai", text: data.response }]);
       setUserMessage("");
     } catch (err) {
-      setError(err.message || "送出失敗，請稍後再試");
+      setMessages(prev => [...prev, { role: "error", text: err.message || "送出失敗，請稍後再試" }]);
     } finally {
       setLoading(false);
-      if (timerRef.current) clearTimeout(timerRef.current);
-      timerRef.current = setTimeout(() => setError(""), 3000);
     }
   };
 
   const handleLogout = async () => {
-    await fetch("/auth/logout", { method: "POST" });
+    await fetch(`${API_BASE}/auth/logout`, { method: "POST", credentials: "include" });
     setUser(null);
   };
 
@@ -64,7 +75,7 @@ export default function App() {
               <button className="login-btn" onClick={handleLogout}>登出</button>
             </span>
           ) : (
-            <a href="/auth/line">
+            <a href={`${API_BASE}/auth/line`}>
               <button className="login-btn"><span style={{ color: "#fff" }}>LINE 登入</span></button>
             </a>
           )}
@@ -73,17 +84,16 @@ export default function App() {
       <div className="chat-area">
         {messages.map((msg, idx) => (
           <div key={idx} className={`chat-row ${msg.role}`}>
-            <div className={`chat-message ${msg.role === "user" ? "chat-user" : "chat-ai"}`}>
+            <div
+              className={`chat-message ${
+                msg.role === "user" ? "chat-user" : msg.role === "error" ? "chat-error" : "chat-ai"
+              }`}
+            >
               {msg.text}
             </div>
           </div>
         ))}
       </div>
-      {error && (
-        <div style={{ color: "#e00", margin: "8px 0", textAlign: "center" }}>
-          {error}
-        </div>
-      )}
       <form className="input-bar" onSubmit={handleSend}>
         <input
           className="user-message-input"
@@ -97,7 +107,7 @@ export default function App() {
         <button
           className="send-btn"
           type="submit"
-          disabled={loading || !userMessage.trim() || !canSend()}
+          disabled={loading || !userMessage.trim()}
           aria-label="送出"
         >
           {loading
