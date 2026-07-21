@@ -16,11 +16,18 @@ WELCOME_MESSAGE = (
     "有任何法律疑問，隨時問我！"
 )
 
+NON_TEXT_MESSAGE_WARNING = "請輸入純文字訊息"
+
 
 def handle_follow_event(user_id: str, reply_token: str) -> None:
     """Triggered when a user adds or re-adds the bot."""
     _ensure_user(user_id)
     _send_reply(reply_token, WELCOME_MESSAGE)
+
+
+def handle_non_text_message(reply_token: str) -> None:
+    """Triggered when a user sends a sticker, image, or other non-text message."""
+    _send_reply(reply_token, NON_TEXT_MESSAGE_WARNING)
 
 
 def handle_text_message(user_id: str, user_text: str, reply_token: str) -> None:

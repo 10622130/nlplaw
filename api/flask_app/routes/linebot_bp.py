@@ -2,7 +2,11 @@ from flask import Blueprint, request, current_app, abort
 import json
 from core.security import validate_signature
 from api.flask_app.models import ProcessedEvent
-from api.flask_app.services.linebot_service import handle_text_message, handle_follow_event
+from api.flask_app.services.linebot_service import (
+    handle_text_message,
+    handle_follow_event,
+    handle_non_text_message,
+)
 
 
 linebot_bp = Blueprint('linebot_bp', __name__)
@@ -53,7 +57,8 @@ def _handle_event(event):
 
 def _handle_message_event(event):
     if event.get("message", {}).get("type") != "text":
-        current_app.logger.info("Ignored non-text message")
+        current_app.logger.info("Non-text message received, prompting user for text")
+        handle_non_text_message(reply_token=event["replyToken"])
         return
 
     handle_text_message(
