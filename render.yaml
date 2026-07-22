@@ -7,10 +7,10 @@ services:
     plan: starter
     healthCheckPath: /auth/me
     envVars:
+      # Postgres is hosted on Neon (neon.tech)
+      # Paste the Neon connection string here manually.
       - key: SQLALCHEMY_DATABASE_URI
-        fromDatabase:
-          name: lawbot-db
-          property: connectionString
+        sync: false
       - key: SECRET_KEY
         generateValue: true
       - key: CHANNEL_SECRET
@@ -31,9 +31,3 @@ services:
         sync: false
       - key: CORS_ORIGINS
         sync: false
-
-databases:
-  - name: lawbot-db
-    plan: basic-256mb
-    databaseName: lawbot
-    user: lawbot
