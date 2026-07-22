@@ -34,4 +34,6 @@ EXPOSE 5002
 HEALTHCHECK --interval=30s --timeout=5s --start-period=15s --retries=3 \
     CMD python -c "import sys,urllib.request; sys.exit(0 if urllib.request.urlopen('http://localhost:5002/auth/me', timeout=3).status == 200 else 1)"
 
-CMD ["gunicorn", "-b", "0.0.0.0:5002", "--workers", "2", "--threads", "4", "--timeout", "60", "api.flask_app.app:app"]
+# Single worker, not multiple: `app = create_app()` in app.py runs
+# `db.create_all()` at module-import time, so workers > 1 they race to CREATE TABLE concurrently, which Postgres
+CMD ["gunicorn", "-b", "0.0.0.0:5002", "--workers", "1", "--threads", "4", "--timeout", "60", "api.flask_app.app:app"]
