@@ -4,11 +4,19 @@
 
 ---
 
+### 服務網址：
+
+- **網頁**：https://nlplaw.stevenaaa1207.workers.dev
+- **Line**: https://lin.ee/omOklzQ
+
+---
+
 ### 專案動機：
 
 台灣法律知識對一般民眾而言門檻高、資料分散。本專案目標是透過 GPT-4o 提供即時法律問答，並整合歷屆律師考試題目，讓有備考需求的使用者能在 LINE 或網頁上練習。
 
-原始版本以單一 Python 檔案實作所有邏輯，全域變數儲存答題狀態、無輸入驗證、無冪等保護，缺少 request 管理邏輯。本次重構整合成具備分層架構、容器化部署、並通過本地測試的完整服務。
+2026更新：
+原始版本以單一 Python 檔案實作所有邏輯。本次重構整合成具備分層架構、容器化部署、並通過本地測試的完整服務，增加了輸入驗證、冪等保護、logging 等端宮能。
 
 ---
 
@@ -35,16 +43,21 @@ NLP/
 │   ├── services/               業務邏輯層
 │   │   ├── linebot_service.py     LINE Bot 訊息處理 pipeline
 │   │   └── exam_service.py        考題流程邏輯
-│   └── models/                 SQLAlchemy ORM（PostgreSQL）
-│       ├── user.py
-│       ├── user_input.py
-│       ├── processed_event.py     冪等保護（Primary Key: webhookEventId）
-│       └── exam_session.py        考題答題寫入狀態
+│   ├── models/                 SQLAlchemy ORM（PostgreSQL）
+│   │   ├── user.py
+│   │   ├── user_input.py
+│   │   ├── processed_event.py     冪等保護（Primary Key: webhookEventId）
+│   │   └── exam_session.py        考題答題寫入狀態
+│   └── tests/                  pytest 測試套件
 │
 ├── web_frontend/            ← React + Vite 前端
 ├── ETL/                     ← 資料爬取處理
 ├── mock_exam_api.py         ← 本地測試用 mock 考題 API（）
-└── docker-compose.yml       ← api + db + mock-exam 三服務
+├── docker-compose.yml       ← api + db + mock-exam 三服務
+├── .coveragerc              ← pytest-cov 覆蓋路徑設定
+├── render.yaml              ← Render Blueprint：API web service 部署
+├── wrangler.jsonc           ← Cloudflare Workers：前端靜態檔案設定
+└── .github/workflows/ci.yml ← GitHub Actions：push/PR 自動跑 pytest
 ```
 
 ---
@@ -76,9 +89,10 @@ NLP/
 - Web LINE Login OAuth 2.0：匿名與登入並行，登入後問答寫入 DB
 - Rich Menu 腳本整合至 `core/richmenu.py`
 - Rich Menu 部署執行（`flask setup-richmenu`）
-- 移除 `LINE/` 舊資料夾
+- 移除 `LINE/`、`web/` 舊資料夾
+- 單元測試：`api/flask_app` + `core` 全層 pytest 覆蓋（91%+），CI（GitHub Actions）每次 push/PR 自動執行
+- 正式環境部署：API（Render）+ 資料庫（Neon Postgres）+ 前端（Cloudflare Workers），含跨網域 LINE Login session 處理
 
 **待解決：**
-- LINE Bot 考題流程 end-to-end 測試（含 mock 考題 API）
-- Health check endpoint
-- 單元測試
+- LINE Bot 考題流程 end-to-end 測試（目前是 mock 外部呼叫的單元測試，尚未串真正的 mock 考題 API server）
+- 正式獨立的 Health check endpoint（目前借用 `/auth/me` 應急）

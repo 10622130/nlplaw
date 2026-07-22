@@ -12,10 +12,10 @@ class ExamSession(db.Model):
         default=lambda: datetime.now(timezone.utc),
         onupdate=lambda: datetime.now(timezone.utc),
     )
-
+    
     @classmethod
     def set(cls, user_id: str, answer: str) -> None:
-        """Upsert the correct answer for the user's current question."""
+        """Update and Insert the correct answer for the user's current question."""
         session = db.session.get(cls, user_id)
         if session:
             session.correct_answer = answer
