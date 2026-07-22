@@ -9,6 +9,7 @@ services:
     # timeout and be treated as a failed webhook.
     plan: free
     healthCheckPath: /auth/me
+    region: singapore
     envVars:
       # Paste the Neon connection string here manually.
       - key: SQLALCHEMY_DATABASE_URI
