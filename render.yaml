@@ -4,7 +4,12 @@ services:
     runtime: docker
     dockerfilePath: ./api/flask_app/Dockerfile
     dockerContext: .
-    plan: starter
+    # Free tier: spins down after 15 min idle, ~30-60s cold start on the
+    # next request. Fine for the web UI (just a slower first response);
+    # a LINE message arriving while asleep may exceed LINE's delivery
+    # timeout and be treated as a failed webhook. Bump to "starter"
+    # ($7/mo) later if that becomes a real problem.
+    plan: free
     healthCheckPath: /auth/me
     envVars:
       # Postgres is hosted on Neon (neon.tech)
